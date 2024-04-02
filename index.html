@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Form</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        color: rgb(235, 235, 235);
+      }
+
+      body {
+        background-color: rgb(15, 15, 15);
+      }
+
+      .main_heading {
+        /* background-color: antiquewhite; */
+        max-width: fit-content;
+        padding: 1vh;
+        margin-inline: auto;
+      }
+
+      .main {
+        background-color: transparent;
+        width: 50%;
+        max-width: 60vh;
+        padding: 2%;
+        margin-inline: auto;
+        margin-top: 10vh;
+      }
+
+      .input {
+        background-color: transparent;
+        padding: 8px 0 8px 0;
+        margin: 2px 0 2px 0;
+        outline: none;
+        border-width: 0 0 2px;
+        border-style: solid;
+        width: 100%;
+        transition: all 0.1s ease;
+      }
+
+      .input:hover,
+      .input::selection {
+        border-style: ridge;
+        border-color: white;
+      }
+
+      label {
+        padding: 5% 0 0 0;
+      }
+
+      .submit {
+        background-color: transparent;
+        width: fit-content;
+        outline: none;
+        border-style: solid;
+        border-width: 3px;
+        border-color: aliceblue;
+        border-radius: 20px;
+        padding: 2vh 3vh 2vh 3vh;
+        margin-top: 4vh;
+        margin-inline: auto;
+        transition: all 0.1s ease;
+      }
+
+      .submit:hover {
+        transform: scale(1.1);
+      }
+
+      .view-link {
+        padding: 4vh 0 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="main_heading">Student Details Form</h1>
+    </header>
+
+    <main>
+      <div class="main">
+        <form action="http://localhost:8081/submit" method="post" class="form">
+          <label for="cid">College ID (Number only)</label> <br />
+          <input class="input" type="number" min="1" max="100" id="cid" name="cid" requierd/> <br />
+          <br />
+
+          <label for="stname">Full Name</label> <br />
+          <input class="input" type="text" id="stname" name="stname" required/> <br />
+          <br />
+
+          <label for="stemail">E-mail</label> <br />
+          <input class="input" type="email" id="stemail" name="stemail" required/> <br />
+          <br />
+
+          <label for="stphno">Phone Number</label> <br />
+          <input class="input" type="tel" pattern="[0-5]{10}" minlength="10" maxlength="10" id="stphno" name="stphno" required/>
+
+          <input type="submit" value="Submit" class="submit" />
+        </form>
+        <p class="view-link">Already submitted? <a href="/view.html">View data</a></p>
+      </div>
+    </main>
+  </body>
+</html>

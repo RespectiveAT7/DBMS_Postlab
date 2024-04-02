@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Student Details</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        color: rgb(235, 235, 235);
+      }
+
+      body {
+        background-color: rgb(15, 15, 15);
+      }
+
+      .main_heading {
+        /* background-color: antiquewhite; */
+        max-width: fit-content;
+        padding: 1vh;
+        margin-inline: auto;
+      }
+
+      .main {
+        display: flex;
+        flex-direction: column;
+        margin-inline: auto;
+        margin-top: 2vh;
+        width: 70%;
+        max-width: 120vh;
+        min-width: 50vh;
+      }
+
+      .search-box {
+        width: 50%;
+        padding: 1vh;
+        border: 0px solid aliceblue;
+        border-width: 0 0 2px 0;
+        outline: none;
+        background-color: transparent;
+        margin: 1vh 0 1vh 0;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 2px solid white;
+      }
+
+      th, td {
+        border: 2px solid white;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+        <h1 class="main_heading">Student Details Viewer</h1>
+    </header>
+    <main class="main">
+      <form action="/getdata" method="post">
+        <input class="search-box" type="text" placeholder="Find via College ID">
+      </form>
+      <table >
+        <tr>
+            <th>College ID</th>
+            <th>Name</th>
+            <th>E-mail</th>
+            <th>Phone Number</th>
+        </tr>
+        <tbody>
+          {{range .Data}}
+          <tr>
+            <td>{{.Name}}</td>
+            <td>{{.Age }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>
