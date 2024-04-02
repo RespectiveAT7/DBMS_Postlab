@@ -72,15 +72,15 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
 
-func tableViewer(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite3", "trial.db")
-	if err != nil {
-		fmt.Println("Sqlite3 error")
-		return
-	}
+// func tableViewer(w http.ResponseWriter, r *http.Request) {
+// 	db, err := sql.Open("sqlite3", "trial.db")
+// 	if err != nil {
+// 		fmt.Println("Sqlite3 error")
+// 		return
+// 	}
 
-	
-}
+// 	
+// }
 
 func main() {
 	fmt.Println("Server Started . . .")
