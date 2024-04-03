@@ -11,4 +11,5 @@ This project uses HTML, JS, Go and Sqlite to store data sent in by the HTML form
 1. Go to the **index.html** page and enter information you want to add.
 2. Next click the **little hyperlink** at the **bottom of the form** to go to the viewer page.
 3. Enter **Cid** you want to lookup the information for and it will appear in the table.
+   
 *Remember to use* **server.exe** *if running on windows and* **server-linux** *binary for linux.*
