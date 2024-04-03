@@ -28,7 +28,7 @@
         margin-inline: auto;
         margin-top: 2vh;
         width: 70%;
-        max-width: 120vh;
+        max-width: 80vh;
         min-width: 50vh;
       }
 
@@ -48,33 +48,43 @@
         border: 2px solid white;
       }
 
-      th, td {
+      th,
+      td {
         border: 2px solid white;
         padding: 8px;
       }
     </style>
+    <!-- <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script> -->
+    <script src="htmx.min.js"></script>
   </head>
   <body>
     <header>
-        <h1 class="main_heading">Student Details Viewer</h1>
+      <h1 class="main_heading">Student Details Viewer</h1>
     </header>
     <main class="main">
-      <form action="/getdata" method="post">
-        <input class="search-box" type="text" placeholder="Find via College ID">
+      <form
+        hx-get="http://localhost:8081/getres"
+        hx-target="#tbody"
+        hx-swap="beforeend"
+        hx-request='{"noHeaders": true}'>
+        <input
+          class="search-box"
+          type="text"
+          placeholder="Find via College ID"
+          name="cid"
+          id="cid"
+        />
+        <button type="submit">Search</button>
       </form>
-      <table >
+      <table>
         <tr>
-            <th>College ID</th>
-            <th>Name</th>
-            <th>E-mail</th>
-            <th>Phone Number</th>
+          <th>College ID</th>
+          <th>Name</th>
+          <th>E-mail</th>
+          <th>Phone Number</th>
         </tr>
-        <tbody>
-          {{range .Data}}
-          <tr>
-            <td>{{.Name}}</td>
-            <td>{{.Age }}</td>
-          </tr>
+        <tbody id="tbody">
+          
         </tbody>
       </table>
     </main>

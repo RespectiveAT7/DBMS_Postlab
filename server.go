@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -21,6 +23,13 @@ CREATE TABLE IF NOT EXISTS studata (
 `
 	tableName string = "studata"
 )
+
+type stuDetails struct {
+	cid     int
+	stname  string
+	stemail string
+	stphno  string
+}
 
 func dataHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -44,48 +53,105 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 	stemail := r.FormValue("stemail")
 	stphno := r.FormValue("stphno")
 
-	
 	db, err := sql.Open("sqlite3", "trial.db")
 	if err != nil {
 		fmt.Println("Sqlite Error: cannot open")
 	}
 	defer db.Close()
-	
+
 	_, err = db.Exec(createTable)
 	if err != nil {
 		fmt.Println("Create table error")
 		return
 	}
-	
+
 	insStmt, err := db.Prepare("INSERT INTO studata(cid, stname, stemail, stphno) VALUES(?, ?, ?, ?)")
 	if err != nil {
+		fmt.Println("Preparation Error")
 		log.Fatal(err)
 	}
 	defer insStmt.Close()
-	
+
 	_, err = insStmt.Exec(cid, stname, stemail, stphno)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Execution Error")
+		http.Error(w, "Cid exists", http.StatusConflict)
+		return
 	}
 
 	db.Close()
 	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
 
-// func tableViewer(w http.ResponseWriter, r *http.Request) {
-// 	db, err := sql.Open("sqlite3", "trial.db")
-// 	if err != nil {
-// 		fmt.Println("Sqlite3 error")
-// 		return
-// 	}
+func tableViewer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*") // or a specific domain
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, hx-request")
 
-// 	
-// }
+	db, err := sql.Open("sqlite3", "trial.db")
+	if err != nil {
+		fmt.Fprintln(w, "Sqlite3 error")
+		return
+	}
+	defer db.Close()
+
+	err = r.ParseForm()
+	if err != nil {
+		fmt.Fprintln(w, "Form Error")
+		return
+	}
+
+	cid, err := strconv.Atoi(r.FormValue("cid"))
+	if err != nil {
+		fmt.Println(err, "Conversion Error")
+		return
+	}
+
+	stmt, err := db.Prepare("SELECT * FROM studata WHERE cid=?")
+	if err != nil {
+		fmt.Fprintln(w, "Prepare error")
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(cid)
+	if err != nil {
+		fmt.Println("Query error")
+		log.Fatalln(err)
+		return
+	}
+	defer rows.Close()
+
+	tableSlice := []string{}
+	for rows.Next() {
+		var newdata stuDetails
+		err = rows.Scan(&newdata.cid, &newdata.stname, &newdata.stemail, &newdata.stphno)
+		if err != nil {
+			fmt.Println("row scan error")
+			log.Fatalln(err)
+			return
+		}
+		newRow := fmt.Sprintf("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>", newdata.cid, newdata.stname, newdata.stemail, newdata.stphno)
+		tableSlice = append(tableSlice, newRow)
+	}
+
+	if err = rows.Err(); err != nil {
+		fmt.Println("Rows iteration error", err)
+		return
+	}
+
+	joinedString := strings.Join(tableSlice, " ")
+	fmt.Println(joinedString)
+	fmt.Fprint(w, joinedString)
+	db.Close()
+}
 
 func main() {
 	fmt.Println("Server Started . . .")
 
 	http.HandleFunc("/submit", dataHandler)
+
+	http.HandleFunc("/getres", tableViewer)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
