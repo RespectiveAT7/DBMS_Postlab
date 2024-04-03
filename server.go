@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
+    "runtime"
+    "path/filepath"
+    
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -78,9 +80,16 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Cid exists", http.StatusConflict)
 		return
 	}
+    
+    _, filename, _, ok := runtime.Caller(0)
+    if !ok {
+        fmt.Println("Couldn't get redirect path")
+    }
+
+    halfPath := filepath.Join(filepath.Dir(filename), "../serverTrial/index.html")
 
 	db.Close()
-	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
+	http.Redirect(w, r, halfPath, http.StatusSeeOther)
 }
 
 func tableViewer(w http.ResponseWriter, r *http.Request) {
