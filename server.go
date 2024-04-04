@@ -86,7 +86,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
         fmt.Println("Couldn't get redirect path")
     }
 
-    halfPath := filepath.Join(filepath.Dir(filename), "../serverTrial/index.html")
+    halfPath := filepath.Join(filepath.Dir(filename), ".././index.html")
 
 	db.Close()
 	http.Redirect(w, r, halfPath, http.StatusSeeOther)
