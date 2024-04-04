@@ -35,7 +35,7 @@ type stuDetails struct {
 
 func dataHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		fmt.Println("Only POST allowed")
+		fmt.Println("Only POST Method allowed")
 		return
 	}
 
