@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -26,11 +24,44 @@ CREATE TABLE IF NOT EXISTS studata (
 	tableName string = "studata"
 )
 
+var (
+	db      *sql.DB
+	insStmt *sql.Stmt
+	selStmt *sql.Stmt
+)
+
 type stuDetails struct {
 	cid     int
 	stname  string
 	stemail string
 	stphno  string
+}
+
+func init() {
+	var err error
+	db, err = sql.Open("sqlite3", "trial.db")
+	if err != nil {
+		fmt.Println("Sqlite Error: cannot open")
+		return
+	}
+
+	_, err = db.Exec(createTable)
+	if err != nil {
+		fmt.Println("Create table error")
+		return
+	}
+
+	insStmt, err = db.Prepare("INSERT INTO studata(cid, stname, stemail, stphno) VALUES(?, ?, ?, ?)")
+	if err != nil {
+		fmt.Println("Preparation Error")
+		return
+	}
+
+	selStmt, err = db.Prepare("SELECT * FROM studata WHERE cid=?")
+	if err != nil {
+		fmt.Println("Prepare error")
+		return
+	}
 }
 
 func dataHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,46 +86,14 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
 	stemail := r.FormValue("stemail")
 	stphno := r.FormValue("stphno")
 
-	db, err := sql.Open("sqlite3", "trial.db")
-	if err != nil {
-		fmt.Println("Sqlite Error: cannot open")
-	}
-	defer db.Close()
-
-	_, err = db.Exec(createTable)
-	if err != nil {
-		fmt.Println("Create table error")
-		return
-	}
-
-	insStmt, err := db.Prepare("INSERT INTO studata(cid, stname, stemail, stphno) VALUES(?, ?, ?, ?)")
-	if err != nil {
-		fmt.Println("Preparation Error")
-		log.Fatal(err)
-	}
-	defer insStmt.Close()
-
 	_, err = insStmt.Exec(cid, stname, stemail, stphno)
 	if err != nil {
 		fmt.Println("Execution Error")
 		http.Error(w, "Cid exists", http.StatusConflict)
 		return
 	}
-    
-    pwd, err := os.Getwd()
-    if err != nil {
-        fmt.Println("Path Error")
-        return
-    }
 
-    pwd = filepath.Join(pwd, "index.html")
-    fmt.Println(pwd)
-
-    pwd = filepath.ToSlash(pwd)
-    fmt.Println(pwd)
-    
-	db.Close()
-	http.Redirect(w, r, pwd, http.StatusSeeOther)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 }
 
 func tableViewer(w http.ResponseWriter, r *http.Request) {
@@ -102,14 +101,7 @@ func tableViewer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, hx-request")
 
-	db, err := sql.Open("sqlite3", "trial.db")
-	if err != nil {
-		fmt.Fprintln(w, "Sqlite3 error")
-		return
-	}
-	defer db.Close()
-
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		fmt.Fprintln(w, "Form Error")
 		return
@@ -121,14 +113,7 @@ func tableViewer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stmt, err := db.Prepare("SELECT * FROM studata WHERE cid=?")
-	if err != nil {
-		fmt.Fprintln(w, "Prepare error")
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(cid)
+	rows, err := selStmt.Query(cid)
 	if err != nil {
 		fmt.Println("Query error")
 		log.Fatalln(err)
@@ -137,8 +122,8 @@ func tableViewer(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	tableSlice := []string{}
+	var newdata stuDetails
 	for rows.Next() {
-		var newdata stuDetails
 		err = rows.Scan(&newdata.cid, &newdata.stname, &newdata.stemail, &newdata.stphno)
 		if err != nil {
 			fmt.Println("row scan error")
@@ -157,10 +142,16 @@ func tableViewer(w http.ResponseWriter, r *http.Request) {
 	joinedString := strings.Join(tableSlice, " ")
 	fmt.Println(joinedString)
 	fmt.Fprint(w, joinedString)
-	db.Close()
 }
 
 func main() {
+	defer insStmt.Close()
+	defer selStmt.Close()
+	defer db.Close()
+
+	fs := http.FileServer(http.Dir("."))
+	http.Handle("/", fs)
+
 	fmt.Println("Server Started . . .")
 
 	http.HandleFunc("/submit", dataHandler)
