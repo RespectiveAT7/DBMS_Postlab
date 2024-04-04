@@ -156,7 +156,7 @@ func getAll(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, hx-request")
 
-	rows, err := selStmt.Query()
+	rows, err := allStmt.Query()
 	if err != nil {
 		fmt.Println("Query error")
 		log.Fatalln(err)
