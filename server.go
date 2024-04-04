@@ -87,7 +87,7 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    pwd = path.Join(pwd, "/index.html")
+    pwd = path.Join(pwd, "index.html")
     fmt.Println(pwd)
 
 	db.Close()
