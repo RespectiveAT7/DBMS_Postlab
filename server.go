@@ -90,6 +90,9 @@ func dataHandler(w http.ResponseWriter, r *http.Request) {
     pwd = filepath.Join(pwd, "index.html")
     fmt.Println(pwd)
 
+    pwd = filepath.ToSlash(pwd)
+    fmt.Println(pwd)
+    
 	db.Close()
 	http.Redirect(w, r, pwd, http.StatusSeeOther)
 }
