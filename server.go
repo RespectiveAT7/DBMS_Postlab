@@ -28,6 +28,7 @@ var (
 	db      *sql.DB
 	insStmt *sql.Stmt
 	selStmt *sql.Stmt
+	allStmt *sql.Stmt
 )
 
 type stuDetails struct {
@@ -53,13 +54,19 @@ func init() {
 
 	insStmt, err = db.Prepare("INSERT INTO studata(cid, stname, stemail, stphno) VALUES(?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println("Preparation Error")
+		fmt.Println("ins Preparation Error")
 		return
 	}
 
 	selStmt, err = db.Prepare("SELECT * FROM studata WHERE cid=?")
 	if err != nil {
-		fmt.Println("Prepare error")
+		fmt.Println("sel Prepare error")
+		return
+	}
+
+	allStmt, err = db.Prepare("SELECT * FROM studata")
+	if err != nil {
+		fmt.Println("all Prepare error")
 		return
 	}
 }
@@ -144,19 +151,58 @@ func tableViewer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, joinedString)
 }
 
+func getAll(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*") // or a specific domain
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, hx-request")
+
+	rows, err := selStmt.Query()
+	if err != nil {
+		fmt.Println("Query error")
+		log.Fatalln(err)
+		return
+	}
+	defer rows.Close()
+
+	tableSlice := make([]string, 0)
+	var newdata stuDetails
+	for rows.Next() {
+		err = rows.Scan(&newdata.cid, &newdata.stname, &newdata.stemail, &newdata.stphno)
+		if err != nil {
+			fmt.Println("row scan error")
+			log.Fatalln(err)
+			return
+		}
+		newRow := fmt.Sprintf("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>", newdata.cid, newdata.stname, newdata.stemail, newdata.stphno)
+		tableSlice = append(tableSlice, newRow)
+	}
+
+	if err = rows.Err(); err != nil {
+		fmt.Println("Rows iteration error", err)
+		return
+	}
+
+	joinedString := strings.Join(tableSlice, " ")
+	fmt.Fprint(w, joinedString)
+}
+
 func main() {
 	defer insStmt.Close()
 	defer selStmt.Close()
+	defer allStmt.Close()
 	defer db.Close()
 
 	fs := http.FileServer(http.Dir("."))
 	http.Handle("/", fs)
 
 	fmt.Println("Server Started . . .")
+    fmt.Println("Hosting at: http://localhost:8081")
 
 	http.HandleFunc("/submit", dataHandler)
 
 	http.HandleFunc("/getres", tableViewer)
+
+	http.HandleFunc("/getall", getAll)
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }

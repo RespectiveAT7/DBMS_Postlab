@@ -42,6 +42,11 @@
         margin: 1vh 0 1vh 0;
       }
 
+      form {
+        display: flex;
+        flex-direction: row;
+      }
+
       table {
         border-collapse: collapse;
         width: 100%;
@@ -52,6 +57,25 @@
       td {
         border: 2px solid white;
         padding: 8px;
+      }
+
+      button {
+        background-color: transparent;
+        outline: 0;
+        border: 2px solid white;
+        border-radius: 20px;
+        padding: 1vh;
+        cursor: pointer;
+        height: fit-content;
+        align-self: center;
+        width: 7vh;
+        min-width: 3vh;
+        transition: all 0.1s linear;
+      }
+
+      button:hover {
+        background-color: rgb(143, 190, 231);
+        color: black;
       }
     </style>
     <!-- <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script> -->
@@ -66,7 +90,8 @@
         hx-get="http://localhost:8081/getres"
         hx-target="#tbody"
         hx-swap="beforeend"
-        hx-request='{"noHeaders": true}'>
+        hx-request='{"noHeaders": true}'
+      >
         <input
           class="search-box"
           type="text"
@@ -74,7 +99,15 @@
           name="cid"
           id="cid"
         />
-        <button type="submit">Search</button>
+        <button type="submit">Find</button>
+        <button
+          type="submit"
+          hx-get="http://localhost:8081/getall"
+          hx-target="#tbody"
+          hx-swap="beforeend"
+        >
+          Get All
+        </button>
       </form>
       <table>
         <tr>
@@ -83,9 +116,7 @@
           <th>E-mail</th>
           <th>Phone Number</th>
         </tr>
-        <tbody id="tbody">
-          
-        </tbody>
+        <tbody id="tbody"></tbody>
       </table>
     </main>
   </body>
