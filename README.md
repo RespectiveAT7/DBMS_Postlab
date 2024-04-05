@@ -13,3 +13,5 @@ This project uses HTML, JS, Go and Sqlite to store data sent in by the HTML form
 3. Enter **Cid** you want to lookup the information for and it will appear in the table.
    
 *Remember to use* **server.exe** *if running on windows and* **server-linux** *binary for linux.*
+
+**WARNING: This project is just a prototype and not to be used for anything else other than testing.**
