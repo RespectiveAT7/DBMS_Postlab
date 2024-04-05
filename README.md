@@ -14,4 +14,6 @@ This project uses HTML, JS, Go and Sqlite to store data sent in by the HTML form
    
 *Remember to use* **server.exe** *if running on windows and* **server-linux** *binary for linux.*
 
+------------
+
 **WARNING: This project is just a prototype and not to be used for anything else other than testing.**
