@@ -12,17 +12,26 @@
       }
 
       body {
+        width: 100%;
         background-color: rgb(15, 15, 15);
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        width: 100%;
+        
       }
 
       .main_heading {
-        /* background-color: antiquewhite; */
+       
         max-width: fit-content;
         padding: 1vh;
         margin-inline: auto;
       }
 
       .main {
+        
         display: flex;
         flex-direction: column;
         margin-inline: auto;
@@ -30,6 +39,7 @@
         width: 70%;
         max-width: 80vh;
         min-width: 50vh;
+        padding: 0 1vh 0 1vh;
       }
 
       .search-box {
@@ -45,6 +55,7 @@
       form {
         display: flex;
         flex-direction: row;
+        
       }
 
       table {
@@ -69,7 +80,6 @@
         height: fit-content;
         align-self: center;
         width: 7vh;
-        min-width: 3vh;
         transition: all 0.1s linear;
       }
 
@@ -101,12 +111,19 @@
         />
         <button type="submit">Find</button>
         <button
-          type="submit"
+          type="button"
           hx-get="http://localhost:8081/getall"
           hx-target="#tbody"
           hx-swap="beforeend"
         >
           Get All
+        </button>
+        <button
+          type="button"
+          id="clear-button"
+          name="clear-button"
+        >
+          Clear
         </button>
       </form>
       <table>
@@ -119,5 +136,13 @@
         <tbody id="tbody"></tbody>
       </table>
     </main>
+    <script>
+      document.getElementById('clear-button').addEventListener('click', function() {
+        var tablebody = document.getElementById('tbody');
+        while (tablebody.firstChild) {
+          tablebody.removeChild(tablebody.firstChild)
+        }
+      })
+    </script>
   </body>
 </html>
